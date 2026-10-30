@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10243a">
+<title>SINDSFOZ | Fiscalização de Eventos</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--navy:#10243a;--blue:#1e496c;--gold:#d6a84f;--bg:#f2f5f8;--ink:#172536;--muted:#637386;--line:#d8e0e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Arial,sans-serif}
+header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:22px 16px 20px}
+.wrap{max-width:900px;margin:auto;padding:16px}
+.brand{font-weight:800;letter-spacing:1.5px;font-size:22px}.sub{color:#dce8f2;font-size:13px;margin-top:4px}
+h1{font-size:22px;margin:16px 0 4px}h2{font-size:18px;margin:0 0 14px;color:var(--navy)}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;box-shadow:0 3px 12px #142b4210}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-size:13px;font-weight:700;color:#425368;margin:8px 0 5px}
+input,select,textarea{width:100%;border:1px solid #cbd5df;border-radius:9px;padding:11px;font:16px Arial;background:white;color:var(--ink)}
+textarea{min-height:78px;resize:vertical}
+.choice{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:7px 0}
+.choice label{display:flex;gap:6px;align-items:center;margin:0;font-weight:500;font-size:15px}
+.choice input{width:auto}
+button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;font-size:15px;cursor:pointer}
+.primary{background:var(--navy);color:white}.secondary{background:#e7edf3;color:var(--navy)}.danger{background:#fae8e8;color:#9b2424}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+.worker{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0;background:#fbfcfd}
+.worker h3{margin:0 0 8px;color:var(--blue)}
+.small{font-size:12px;color:var(--muted)}
+#savedList button{margin:4px 5px 4px 0}
+.status{padding:10px;border-radius:9px;background:#fff8e8;color:#775516;font-size:13px}
+.hide{display:none}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.wrap{padding:11px}header{padding:18px 14px}}
+.signature-pad{width:100%;height:150px;border:1px dashed #8b9aaa;border-radius:10px;background:#fff;touch-action:none;display:block}
+.signature-box{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}
+@media print{
+ .signature-print{break-inside:avoid;border:1px solid #888;padding:12px;margin-top:20px}
+ .signature-print img{max-height:75px;max-width:100%;object-fit:contain}
+
+ body{background:white;font-size:11pt}header{background:white!important;color:#10243a!important;padding:0 0 12px;border-bottom:2px solid #10243a}
+ .sub{color:#444}.wrap{max-width:none;padding:0}.no-print,.actions,button{display:none!important}
+ .card{box-shadow:none;border:0;padding:8px 0;margin:5px 0}
+ .worker{border:1px solid #888;break-inside:avoid;margin:10px 0;padding:12px}
+ h1{font-size:18pt}h2{font-size:13pt}
+ input,select,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;padding:3px 0;font-size:10pt}
+ textarea{min-height:35px}
+ .choice{gap:12px;padding:2px 0}
+ .page-break{break-before:page}
+ .print-title{display:block!important}
+}
+.print-title{display:none}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap">
+  <div class="brand">SINDSFOZ</div>
+  <div class="sub">Sindicato dos Vigilantes de Foz do Iguaçu</div>
+  <h1>Fiscalização de Eventos</h1>
+  <div class="sub">Registro de condições de trabalho e documentação da fiscalização</div>
+ </div>
+</header>
+<main class="wrap">
+ <div class="status no-print">Os registros ficam armazenados neste aparelho. Exporte um backup regularmente. Limpar os dados do navegador pode apagar as fiscalizações salvas.</div>
+ <section class="card no-print">
+  <h2>Identificação do evento</h2>
+  <div class="grid">
+   <div><label>Data da fiscalização</label><input id="date" type="date"></div>
+   <div><label>Horário</label><input id="time" type="time"></div>
+   <div><label>Evento / local</label><input id="event" placeholder="Nome do evento ou local"></div>
+   <div><label>Empresa</label><input id="company" placeholder="Nome da empresa"></div>
+   <div><label>Fiscal responsável</label><input id="inspector" placeholder="Nome do representante sindical"></div>
+   <div><label>Contato / referência (opcional)</label><input id="contact" placeholder="Telefone ou responsável no local"></div>
+  </div>
+ </section>
+ <section class="card no-print">
+  <h2>Assinaturas da fiscalização</h2>
+  <div class="signature-box"><label>Assinatura do fiscal do SINDSFOZ</label>
+   <canvas id="sigInspector" class="signature-pad" width="900" height="220"></canvas>
+   <button class="secondary" type="button" onclick="clearSignature('sigInspector')">Limpar assinatura do fiscal</button></div>
+  <div class="signature-box"><label>Assinatura do responsável pela empresa (opcional)</label>
+   <canvas id="sigCompany" class="signature-pad" width="900" height="220"></canvas>
+   <button class="secondary" type="button" onclick="clearSignature('sigCompany')">Limpar assinatura da empresa</button></div>
+  <p class="small">As assinaturas serão inseridas no relatório PDF como imagem.</p>
+ </section>
+ <section class="card no-print">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+   <h2 style="margin:0">Vigilantes fiscalizados</h2>
+   <button class="primary" onclick="addWorker()">+ Adicionar vigilante</button>
+  </div>
+  <div id="workers"></div>
+  <div class="actions">
+   <button class="secondary" onclick="saveRecord()">Salvar fiscalização</button>
+   <button class="primary" onclick="makePDF()">Gerar relatório PDF</button>
+   <button class="secondary" onclick="clearForm()">Nova fiscalização / limpar</button>
+  </div>
+ </section>
+ <section class="card no-print">
+  <h2>Fiscalizações salvas neste aparelho</h2>
+  <div id="savedList" class="small">Nenhum registro salvo.</div>
+  <div class="actions">
+   <button class="secondary" onclick="exportBackup()">Exportar backup</button>
+   <label class="secondary" style="display:inline-block;padding:12px 15px;border-radius:10px;cursor:pointer">Importar backup<input type="file" accept=".json,application/json" style="display:none" onchange="importBackup(event)"></label>
+  </div>
+ </section>
+ <section id="printReport" class="print-title"></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let workers=[];
+let editingId=null;
+const yesNo=(name)=>`<div class="choice"><label><input type="radio" name="${name}" value="Sim"> Sim</label><label><input type="radio" name="${name}" value="Não" checked> Não</label><label><input type="radio" name="${name}" value="Não informado"> Não informado</label></div>`;
+function addWorker(data={}){
+ const id=crypto.randomUUID?crypto.randomUUID():String(Date.now()+Math.random());
+ workers.push({id,...data});
+ renderWorkers();
+}
+function renderWorkers(){
+ $('workers').innerHTML=workers.map((w,i)=>`
+ <div class="worker" data-id="${w.id}">
+  <h3>Vigilante ${i+1}</h3>
+  <div class="grid">
+   <div><label>Nome do vigilante</label><input data-k="name" value="${esc(w.name||'')}" placeholder="Nome completo"></div>
+   <div><label>Modalidade de contratação</label><select data-k="modality"><option ${w.modality==='Intermitente'?'selected':''}>Intermitente</option><option ${w.modality==='Outra modalidade'?'selected':''}>Outra modalidade</option><option ${!w.modality?'selected':''}>Não informado</option></select></div>
+   <div><label>Valor da diária (R$)</label><input data-k="daily" inputmode="decimal" value="${esc(w.daily||'')}" placeholder="0,00"></div>
+   <div><label>Quantidade de horas de trabalho</label><input data-k="hours" value="${esc(w.hours||'')}" placeholder="Ex.: 8 horas"></div>
+  </div>
+  ${['Alimentação','Transporte','Protetor auricular','Reciclagem','Uniforme','CNV','Curso Grandes Eventos'].map((x)=>`
+   <div class="grid" style="grid-template-columns:1fr auto;align-items:center;border-top:1px solid #e7edf2;padding:4px 0">
+    <strong style="font-size:14px">${x}</strong><div class="choice">${['Sim','Não','Não informado'].map(v=>`<label><input type="radio" data-check="${x}" name="${w.id}_${x}" value="${v}" ${(w.checks?.[x]||'Não informado')===v?'checked':''}>${v}</label>`).join('')}</div>
+   </div>`).join('')}
+  <label>Observações / irregularidades</label><textarea data-k="notes" placeholder="Descreva situações encontradas, pendências e providências solicitadas...">${esc(w.notes||'')}</textarea>
+  <label>Fotos / evidências (opcional)</label><input data-k="photos" type="file" accept="image/*" multiple onchange="loadPhotos(this, '${w.id}')">
+  <div class="small">${(w.photos||[]).length} foto(s) anexada(s)</div>
+  <div class="actions"><button class="danger" onclick="removeWorker('${w.id}')">Remover vigilante</button></div>
+ </div>`).join('');
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function loadPhotos(input,id){
+ const w=workers.find(x=>x.id===id); if(!w)return;
+ const files=[...input.files]; w.photos=w.photos||[];
+ for(const f of files){
+  if(f.size>1200000){alert('Uma foto excede 1,2 MB e foi ignorada. Reduza o tamanho da imagem.');continue;}
+  const data=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f)});
+  w.photos.push(data);
+ }
+ const box=input.closest('.worker');
+ const info=box?.querySelector('.small');
+ if(info)info.textContent=(w.photos||[]).length+' foto(s) anexada(s)';
+ input.value='';
+}
+function collectWorkers(){
+ document.querySelectorAll('.worker').forEach(el=>{
+  const id=el.dataset.id,w=workers.find(x=>x.id===id); if(!w)return;
+  el.querySelectorAll('[data-k]').forEach(inp=>{
+   const k=inp.dataset.k;
+   if(k==='photos')return;
+   w[k]=inp.value;
+  });
+  w.checks={};
+  el.querySelectorAll('[data-check]').forEach(inp=>{if(inp.checked)w.checks[inp.dataset.check]=inp.value;});
+ });
+}
+async function readPhotos(){
+ const blocks=[...document.querySelectorAll('.worker')];
+ for(const el of blocks){
+  const w=workers.find(x=>x.id===el.dataset.id),files=el.querySelector('[data-k="photos"]').files;
+  if(files?.length){w.photos=w.photos||[];for(const f of files){if(f.size>1200000){alert('Uma foto excede 1,2 MB e foi ignorada. Reduza o tamanho da imagem.');continue;}
+   const data=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f)});
+   w.photos.push(data);
+  }}
+ }
+}
+function removeWorker(id){workers=workers.filter(w=>w.id!==id);renderWorkers();}
+function signatureData(id){const c=$(id);if(!c)return '';const d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;for(let i=3;i<d.length;i+=4)if(d[i])return c.toDataURL('image/png');return '';}
+function clearSignature(id){const c=$(id);if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);}
+function setupSignature(id){const c=$(id);if(!c)return;const x=c.getContext('2d');x.lineWidth=4;x.lineCap='round';x.lineJoin='round';x.strokeStyle='#14283d';let down=false;const pt=e=>{const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};};c.addEventListener('pointerdown',e=>{down=true;c.setPointerCapture(e.pointerId);const p=pt(e);x.beginPath();x.moveTo(p.x,p.y);});c.addEventListener('pointermove',e=>{if(down){const p=pt(e);x.lineTo(p.x,p.y);x.stroke();}});['pointerup','pointercancel'].forEach(t=>c.addEventListener(t,()=>down=false));}
+setupSignature('sigInspector');setupSignature('sigCompany');
+function formData(){return {id:editingId||String(Date.now()),date:$('date').value,time:$('time').value,event:$('event').value,company:$('company').value,inspector:$('inspector').value,contact:$('contact').value,signatureInspector:signatureData('sigInspector'),signatureCompany:signatureData('sigCompany'),workers:workers};}
+async function saveRecord(){
+ collectWorkers();await readPhotos();
+ if(!workers.length){alert('Adicione pelo menos um vigilante.');return;}
+ const r=formData(),all=JSON.parse(localStorage.getItem('sindsfoz_records')||'[]'),idx=all.findIndex(x=>x.id===r.id);
+ if(idx>=0)all[idx]=r;else all.unshift(r);
+ try{localStorage.setItem('sindsfoz_records',JSON.stringify(all));editingId=r.id;renderSaved();alert('Fiscalização salva neste aparelho.');}
+ catch(e){alert('Não foi possível salvar. O armazenamento pode estar cheio; exporte o backup e remova fotos grandes.');}
+}
+function renderSaved(){
+ const all=JSON.parse(localStorage.getItem('sindsfoz_records')||'[]');
+ $('savedList').innerHTML=all.length?all.map(r=>`<div style="padding:9px 0;border-bottom:1px solid #e4eaf0"><strong>${esc(r.event||'Evento sem nome')}</strong> — ${esc(r.company||'Empresa não informada')}<br><span>${esc(r.date||'Sem data')} · ${(r.workers||[]).length} vigilante(s)</span><br><button class="secondary" onclick="loadRecord('${r.id}')">Abrir</button><button class="secondary" onclick="pdfSaved('${r.id}')">PDF</button><button class="danger" onclick="deleteRecord('${r.id}')">Excluir</button></div>`).join(''):'Nenhum registro salvo.';
+}
+function loadRecord(id){
+ const r=JSON.parse(localStorage.getItem('sindsfoz_records')||'[]').find(x=>x.id===id);if(!r)return;
+ editingId=r.id;['date','time','event','company','inspector','contact'].forEach(k=>$(k).value=r[k]||'');
+ workers=JSON.parse(JSON.stringify(r.workers||[]));renderWorkers();['sigInspector','sigCompany'].forEach((id,i)=>{clearSignature(id);const d=i===0?r.signatureInspector:r.signatureCompany;if(d){const im=new Image();im.onload=()=>$(id).getContext('2d').drawImage(im,0,0,900,220);im.src=d;}});window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteRecord(id){if(!confirm('Excluir esta fiscalização salva?'))return;localStorage.setItem('sindsfoz_records',JSON.stringify(JSON.parse(localStorage.getItem('sindsfoz_records')||'[]').filter(x=>x.id!==id)));renderSaved();}
+function clearForm(){if(!confirm('Limpar o formulário atual? Salve antes se quiser guardar.'))return;editingId=null;['date','time','event','company','inspector','contact'].forEach(k=>$(k).value='');clearSignature('sigInspector');clearSignature('sigCompany');workers=[];addWorker();renderWorkers();}
+function reportHTML(r){
+ return `<header><div class="brand">SINDSFOZ</div><div class="sub">Sindicato dos Vigilantes de Foz do Iguaçu</div><h1>RELATÓRIO DE FISCALIZAÇÃO DE EVENTOS</h1></header>
+ <div class="card"><h2>Identificação do evento</h2><p><b>Evento / local:</b> ${esc(r.event||'—')}<br><b>Empresa:</b> ${esc(r.company||'—')}<br><b>Data:</b> ${esc(r.date||'—')} &nbsp; <b>Horário:</b> ${esc(r.time||'—')}<br><b>Fiscal responsável:</b> ${esc(r.inspector||'—')}<br><b>Contato / referência:</b> ${esc(r.contact||'—')}</p></div>
+ ${r.workers.map((w,i)=>`<div class="worker ${i?'page-break':''}"><h2>FICHA DO VIGILANTE ${i+1}</h2><p><b>Nome:</b> ${esc(w.name||'—')}<br><b>Modalidade:</b> ${esc(w.modality||'—')}<br><b>Valor da diária:</b> R$ ${esc(w.daily||'—')}<br><b>Horas de trabalho:</b> ${esc(w.hours||'—')}</p><h2>Checklist</h2>${['Alimentação','Transporte','Protetor auricular','Reciclagem','Uniforme','CNV','Curso Grandes Eventos'].map(x=>`<p><b>${x}:</b> ${esc(w.checks?.[x]||'Não informado')}</p>`).join('')}<p><b>Observações / irregularidades:</b><br>${esc(w.notes||'Nenhuma observação registrada.').replace(/\n/g,'<br>')}</p>${(w.photos||[]).map((p,j)=>`<div><b>Foto ${j+1}</b><br><img src="${p}" style="max-width:100%;max-height:240px;object-fit:contain"></div>`).join('')}<p style="margin-top:45px">_________________________________________<br>Assinatura / identificação do responsável</p></div>`).join('')}
+ <div class="signature-print"><h2>ASSINATURAS</h2>
+ <p><b>Fiscal responsável – SINDSFOZ</b></p>${r.signatureInspector?`<img src="${r.signatureInspector}">`:'<div style="height:45px"></div>'}
+ <p>Nome: ${esc(r.inspector||'—')}</p><p>____________________________________________</p>
+ <p><b>Responsável pela empresa (opcional)</b></p>${r.signatureCompany?`<img src="${r.signatureCompany}">`:'<div style="height:45px"></div>'}
+ <p>Nome: ________________________________________</p><p>____________________________________________</p></div>
+ <p style="font-size:9pt;color:#555;margin-top:20px">Documento gerado pelo SINDSFOZ – Fiscalização de Eventos.</p>`;
+}
+function makePDF(){
+ try{
+  collectWorkers();
+  if(!workers.length){alert('Adicione pelo menos um vigilante.');return;}
+  const r=formData();
+  $('printReport').innerHTML=reportHTML(r);
+  window.print();
+ }catch(err){
+  alert('Não foi possível preparar o PDF. Erro: '+(err?.message||err));
+ }
+}
+function pdfSaved(id){const r=JSON.parse(localStorage.getItem('sindsfoz_records')||'[]').find(x=>x.id===id);if(!r)return;$('printReport').innerHTML=reportHTML(r);window.print();}
+function exportBackup(){const data=localStorage.getItem('sindsfoz_records')||'[]',blob=new Blob([data],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='backup-sindsfoz-fiscalizacoes.json';a.click();URL.revokeObjectURL(a.href);}
+function importBackup(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const incoming=JSON.parse(rd.result),current=JSON.parse(localStorage.getItem('sindsfoz_records')||'[]'),map=new Map(current.map(x=>[x.id,x]));incoming.forEach(x=>map.set(x.id,x));localStorage.setItem('sindsfoz_records',JSON.stringify([...map.values()]));renderSaved();alert('Backup importado.');}catch(err){alert('Arquivo de backup inválido.');}};rd.readAsText(f);}
+$('date').value=new Date().toISOString().slice(0,10);addWorker();renderSaved();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+</script>
+</body></html>

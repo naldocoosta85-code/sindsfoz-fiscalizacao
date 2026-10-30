@@ -1,0 +1,8 @@
+{
+  "name": "SINDSFOZ - Fiscalização de Eventos",
+  "short_name": "SINDSFOZ Fiscalização",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f2f5f8",
+  "theme_color": "#10243a"
+}

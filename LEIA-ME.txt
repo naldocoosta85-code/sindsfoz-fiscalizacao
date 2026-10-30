@@ -1,0 +1,7 @@
+SINDSFOZ Fiscalização de Eventos – Versão 2
+
+Novidades: assinatura do fiscal e assinatura opcional do representante da empresa por toque, inseridas no PDF.
+
+Atualização: extraia este ZIP em uma pasta nova e abra index.html no Chrome. Teste com dados fictícios antes do uso.
+
+A numeração é local ao navegador/aparelho e não é sincronizada entre celulares. Para inserir o logotipo oficial, envie o arquivo de imagem do SINDSFOZ.
