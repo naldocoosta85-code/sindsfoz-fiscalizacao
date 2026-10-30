@@ -34,18 +34,34 @@ button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;font-size:1
 .signature-pad{width:100%;height:150px;border:1px dashed #8b9aaa;border-radius:10px;background:#fff;touch-action:none;display:block}
 .signature-box{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}
 @media print{
- .signature-print{break-inside:avoid;border:1px solid #888;padding:12px;margin-top:20px}
- .signature-print img{max-height:75px;max-width:100%;object-fit:contain}
-
- body{background:white;font-size:11pt}header{background:white!important;color:#10243a!important;padding:0 0 12px;border-bottom:2px solid #10243a}
- .sub{color:#444}.wrap{max-width:none;padding:0}.no-print,.actions,button{display:none!important}
- .card{box-shadow:none;border:0;padding:8px 0;margin:5px 0}
- .worker{border:1px solid #888;break-inside:avoid;margin:10px 0;padding:12px}
- h1{font-size:18pt}h2{font-size:13pt}
- input,select,textarea{border:0;border-bottom:1px solid #aaa;border-radius:0;padding:3px 0;font-size:10pt}
- textarea{min-height:35px}
- .choice{gap:12px;padding:2px 0}
- .page-break{break-before:page}
+ @page{size:A4 portrait;margin:8mm}
+ body{background:#fff!important;color:#172536;font:8.5pt/1.2 Arial,sans-serif}
+ body>header{display:none!important}
+ .wrap{max-width:none;padding:0;margin:0}
+ .no-print,.actions,button{display:none!important}
+ #printReport{display:block!important;width:100%}
+ #printReport .report-head{border-bottom:1.5px solid #10243a;padding:0 0 5px;margin:0 0 6px}
+ #printReport .brand{font-size:13pt;letter-spacing:1.2px}
+ #printReport .sub{color:#444;font-size:7.5pt;margin-top:1px}
+ #printReport h1{font-size:12pt;margin:4px 0 0}
+ #printReport h2{font-size:9pt;margin:0 0 3px;color:#10243a}
+ #printReport .report-section{border:1px solid #aab4bf;border-radius:4px;padding:5px 6px;margin:0 0 5px;break-inside:avoid}
+ #printReport p{margin:2px 0}
+ #printReport .event-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px}
+ #printReport .worker{border:1px solid #aab4bf;border-radius:4px;padding:5px 6px;margin:0 0 5px;background:#fff;break-inside:avoid}
+ #printReport .worker h2{margin-bottom:4px}
+ #printReport .worker-data{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:3px 8px;margin-bottom:4px}
+ #printReport .check-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px 8px;margin:3px 0 4px}
+ #printReport .check-item{font-size:7.7pt}
+ #printReport .notes{margin-top:3px}
+ #printReport .photos{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+ #printReport .photos img{max-width:28mm!important;max-height:20mm!important;object-fit:contain}
+ #printReport .signature-print{border:1px solid #aab4bf;border-radius:4px;padding:5px 6px;margin:0;break-inside:avoid}
+ #printReport .signature-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ #printReport .signature-print img{display:block;max-height:14mm;max-width:100%;object-fit:contain}
+ #printReport .signature-line{border-top:1px solid #333;margin-top:12mm;padding-top:2px;font-size:7.5pt}
+ #printReport .signature-print p{font-size:7.5pt}
+ #printReport .report-footer{font-size:6.8pt;color:#555;margin-top:4px;text-align:center}
  .print-title{display:block!important}
 }
 .print-title{display:none}
@@ -197,15 +213,12 @@ function loadRecord(id){
 function deleteRecord(id){if(!confirm('Excluir esta fiscalização salva?'))return;localStorage.setItem('sindsfoz_records',JSON.stringify(JSON.parse(localStorage.getItem('sindsfoz_records')||'[]').filter(x=>x.id!==id)));renderSaved();}
 function clearForm(){if(!confirm('Limpar o formulário atual? Salve antes se quiser guardar.'))return;editingId=null;['date','time','event','company','inspector','contact'].forEach(k=>$(k).value='');clearSignature('sigInspector');clearSignature('sigCompany');workers=[];addWorker();renderWorkers();}
 function reportHTML(r){
- return `<header><div class="brand">SINDSFOZ</div><div class="sub">Sindicato dos Vigilantes de Foz do Iguaçu</div><h1>RELATÓRIO DE FISCALIZAÇÃO DE EVENTOS</h1></header>
- <div class="card"><h2>Identificação do evento</h2><p><b>Evento / local:</b> ${esc(r.event||'—')}<br><b>Empresa:</b> ${esc(r.company||'—')}<br><b>Data:</b> ${esc(r.date||'—')} &nbsp; <b>Horário:</b> ${esc(r.time||'—')}<br><b>Fiscal responsável:</b> ${esc(r.inspector||'—')}<br><b>Contato / referência:</b> ${esc(r.contact||'—')}</p></div>
- ${r.workers.map((w,i)=>`<div class="worker ${i?'page-break':''}"><h2>FICHA DO VIGILANTE ${i+1}</h2><p><b>Nome:</b> ${esc(w.name||'—')}<br><b>Modalidade:</b> ${esc(w.modality||'—')}<br><b>Valor da diária:</b> R$ ${esc(w.daily||'—')}<br><b>Horas de trabalho:</b> ${esc(w.hours||'—')}</p><h2>Checklist</h2>${['Alimentação','Transporte','Protetor auricular','Reciclagem','Uniforme','CNV','Curso Grandes Eventos'].map(x=>`<p><b>${x}:</b> ${esc(w.checks?.[x]||'Não informado')}</p>`).join('')}<p><b>Observações / irregularidades:</b><br>${esc(w.notes||'Nenhuma observação registrada.').replace(/\n/g,'<br>')}</p>${(w.photos||[]).map((p,j)=>`<div><b>Foto ${j+1}</b><br><img src="${p}" style="max-width:100%;max-height:240px;object-fit:contain"></div>`).join('')}<p style="margin-top:45px">_________________________________________<br>Assinatura / identificação do responsável</p></div>`).join('')}
- <div class="signature-print"><h2>ASSINATURAS</h2>
- <p><b>Fiscal responsável – SINDSFOZ</b></p>${r.signatureInspector?`<img src="${r.signatureInspector}">`:'<div style="height:45px"></div>'}
- <p>Nome: ${esc(r.inspector||'—')}</p><p>____________________________________________</p>
- <p><b>Responsável pela empresa (opcional)</b></p>${r.signatureCompany?`<img src="${r.signatureCompany}">`:'<div style="height:45px"></div>'}
- <p>Nome: ________________________________________</p><p>____________________________________________</p></div>
- <p style="font-size:9pt;color:#555;margin-top:20px">Documento gerado pelo SINDSFOZ – Fiscalização de Eventos.</p>`;
+ const checks=['Alimentação','Transporte','Protetor auricular','Reciclagem','Uniforme','CNV','Curso Grandes Eventos'];
+ return `<div class="report-head"><div class="brand">SINDSFOZ</div><div class="sub">Sindicato dos Vigilantes de Foz do Iguaçu</div><h1>RELATÓRIO DE FISCALIZAÇÃO DE EVENTOS</h1></div>
+ <section class="report-section"><h2>IDENTIFICAÇÃO DO EVENTO</h2><div class="event-grid"><div><b>Evento / local:</b> ${esc(r.event||'—')}</div><div><b>Empresa:</b> ${esc(r.company||'—')}</div><div><b>Data:</b> ${esc(r.date||'—')}</div><div><b>Horário:</b> ${esc(r.time||'—')}</div><div><b>Fiscal responsável:</b> ${esc(r.inspector||'—')}</div><div><b>Contato / referência:</b> ${esc(r.contact||'—')}</div></div></section>
+ ${r.workers.map((w,i)=>`<section class="worker"><h2>FICHA DO VIGILANTE ${i+1}</h2><div class="worker-data"><div><b>Nome:</b> ${esc(w.name||'—')}</div><div><b>Modalidade:</b> ${esc(w.modality||'—')}</div><div><b>Diária:</b> R$ ${esc(w.daily||'—')}</div><div><b>Horas:</b> ${esc(w.hours||'—')}</div></div><b>CHECKLIST</b><div class="check-grid">${checks.map(x=>`<div class="check-item"><b>${x}:</b> ${esc(w.checks?.[x]||'Não informado')}</div>`).join('')}</div><div class="notes"><b>Observações / irregularidades:</b> ${esc(w.notes||'Nenhuma observação registrada.').replace(/\n/g,'<br>')}</div>${(w.photos||[]).length?`<div class="photos">${(w.photos||[]).map((p,j)=>`<div><b>Foto ${j+1}</b><br><img src="${p}"></div>`).join('')}</div>`:''}</section>`).join('')}
+ <section class="signature-print"><h2>ASSINATURAS</h2><div class="signature-grid"><div><p><b>Fiscal responsável – SINDSFOZ</b></p>${r.signatureInspector?`<img src="${r.signatureInspector}">`:''}<div class="signature-line">${esc(r.inspector||'Nome do fiscal')}</div></div><div><p><b>Responsável pela empresa (opcional)</b></p>${r.signatureCompany?`<img src="${r.signatureCompany}">`:''}<div class="signature-line">Nome / assinatura</div></div></div></section>
+ <div class="report-footer">Documento gerado pelo SINDSFOZ – Fiscalização de Eventos.</div>`;
 }
 function makePDF(){
  try{
