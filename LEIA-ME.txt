@@ -1,7 +1,8 @@
-SINDSFOZ Fiscalização de Eventos – Versão 2
+SINDSFOZ – Fiscalização de Eventos | Atualização de identidade visual
 
-Novidades: assinatura do fiscal e assinatura opcional do representante da empresa por toque, inseridas no PDF.
+Esta versão inclui o logotipo oficial como ícone do aplicativo para Android, iPhone/iPad e navegador.
 
-Atualização: extraia este ZIP em uma pasta nova e abra index.html no Chrome. Teste com dados fictícios antes do uso.
+Para atualizar o GitHub Pages, envie/substitua os arquivos desta pasta na raiz do repositório.
+Arquivos principais: index.html, manifest.webmanifest, service-worker.js, icon-192.png, icon-512.png, apple-touch-icon.png, favicon-32.png e favicon-48.png.
 
-A numeração é local ao navegador/aparelho e não é sincronizada entre celulares. Para inserir o logotipo oficial, envie o arquivo de imagem do SINDSFOZ.
+Após publicar, feche o aplicativo no celular e abra novamente pelo navegador. Se o ícone antigo continuar, remova o atalho antigo da tela inicial e instale novamente.
